@@ -1,0 +1,21 @@
+{
+  "name": "jsRogue",
+  "version": "0.0.1",
+  "description": "A Roguelike in Javascript",
+  "private": true,
+  "author": "Christiaan Janssen",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack serve"
+  },
+  "devDependencies": {
+    "webpack": "^5.55.1",
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.3.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "rot-js": "^2.2.0"
+  }
+}
