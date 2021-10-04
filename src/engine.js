@@ -1,4 +1,4 @@
-import { Display, Map } from "rot-js";
+import { Display, Map, FOV } from "rot-js";
 import { EventHandler } from './input_handlers';
 import { Entity } from './entity';
 
@@ -17,6 +17,8 @@ export class Engine {
             this.mapData._rooms[0]._x1,
             this.mapData._rooms[0]._y1, "@", "white"
         );
+        this.fov;
+        this.viewshed = [];
     }
 
     handleEvents(e) {
@@ -28,8 +30,8 @@ export class Engine {
             }
         }
         this.render();
-
     }
+
 
     createMap(w, h) {
         let mapData = new Map.Digger(w, h);
@@ -39,18 +41,35 @@ export class Engine {
         mapData.create((x, y, val) => {
             this.map[x][y] = val;
         });
-        console.log(mapData);
+        this.fov = new FOV.PreciseShadowcasting((x,y) => {
+            if (this.map[x][y] == 0) {
+                return true;
+            }
+                return false;
+            }
+        );
+
         return mapData;
     }
 
+
     render() {
+        this.viewshed = [];
+        this.fov.compute(
+            this.player.x, this.player.y, 10, (x,y,r,v) => {
+                this.viewshed.push(x+','+y)
+            }
+        )
+
         this.display.clear();
         for (let x = 0; x < this.mapWidth; x++) {
             for (let y = 0; y < this.mapHeight; y++) {
-                if (this.map[x][y] === 1) {
-                    this.display.draw(x, y, '#');
-                } else if (this.map[x][y] === 2) {
-                    this.display.draw(x, y, '+');
+                if (this.viewshed.includes(x+','+y)) {
+                    if (this.map[x][y] === 0) {
+                        this.display.draw(x, y, '.');
+                    } else if (this.map[x][y] === 1) {
+                        this.display.draw(x, y, '#');
+                    }
                 }
             }
         }
