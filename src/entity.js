@@ -10,12 +10,14 @@ export class Entity {
      * @param {number} y
      * @param {string} glyph
      * @param {string} color
+     * @param {string} name
      */
-    constructor(x, y, glyph, color) {
+    constructor(x, y, glyph, color, name) {
         this.x = x;
         this.y = y;
         this.glyph = glyph;
         this.color = color;
+        this.name = name;
     }
 
     /**

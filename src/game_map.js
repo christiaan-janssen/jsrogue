@@ -1,4 +1,5 @@
 import { Map, FOV  } from "rot-js";
+import { Entity  } from './entity';
 
 class Tile {
   constructor(type) {
@@ -28,6 +29,7 @@ export class GameMap {
     this.map = new Array(width);
     this.mapData = this.createMap(this.width, this.height);
     this.rooms = this.mapData.getRooms();
+    this.entities = this.createMonsters(this.rooms);
     this.fov;
     this.viewshed = [];
   }
@@ -44,7 +46,6 @@ export class GameMap {
         this.map[x][y] = new Tile('wall');
       }
     });
-    console.log(this.map)
 
     /*
      * Setup the FOV. The callback function looks at what parts of the map
@@ -62,6 +63,23 @@ export class GameMap {
     );
 
     return mapData;
+  }
+
+  createMonsters(rooms) {
+    let entities = [];
+    for (let i = 1; i < rooms.length; i++) {
+      let enemy = new Entity(rooms[i]._x1+1, rooms[i]._y1+1, 'o', 'green', 'Orc')
+      entities.push(enemy);
+    }
+    return entities;
+  }
+
+  getBlockingEntityAt(x,y) {
+    for (let i=0;i<this.entities.length;i++) {
+      if (this.entities[i].x === x && this.entities[i].y === y) {
+        return this.entities[i];
+      }
+    }
   }
 
   /*
