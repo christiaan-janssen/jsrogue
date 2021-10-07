@@ -2,6 +2,13 @@ import { Display } from "rot-js";
 import { EventHandler } from './input_handlers';
 import { Entity } from './entity';
 import { GameMap } from './game_map';
+import { Fighter } from './components';
+
+/**
+ * Main game engine. Handles input / rendering / gameState
+ * TODO: Fix low cohesion in this class
+ * TODO: Look into scheduling: https://ondras.github.io/rot.js/manual/#timing 
+ */
 
 export class Engine {
     constructor(width, height) {
@@ -17,6 +24,7 @@ export class Engine {
             this.map.rooms[0]._y1+1,
             "@", "white", "Player"
         );
+        this.player.components.fighter = new Fighter(3, 2, 15);
     }
 
     handleEvents(e) {
@@ -27,8 +35,10 @@ export class Engine {
             let dy = this.player.y + action.dy;
             let maybeEntity =  this.map.getBlockingEntityAt(dx, dy);
             if (maybeEntity !== undefined) {
-                this.gameLog.push(`You hit the ${maybeEntity.name}`);
-                console.log(this.gameLog);
+                let dmg = this.player.components.fighter.attack - maybeEntity.components.fighter.defence;
+                maybeEntity.components.fighter.takeDmg(dmg);
+                console.log(maybeEntity.components.fighter.hp);
+                this.gameLog.push(`You hit the ${maybeEntity.name} for ${dmg} damage`);
             } else if (!this.map.map[dx][dy].isWall()) {
                 this.player.move(action.dx, action.dy);
             }
@@ -36,6 +46,7 @@ export class Engine {
         }
         this.render();
     }
+
     renderLog() {
         for (let i = 0; i < this.gameLog.length; i++) {
             this.display.drawText(20, 41+i, this.gameLog[i]);
@@ -43,6 +54,10 @@ export class Engine {
         if (this.gameLog.length > 7) {
             this.gameLog.shift();
         }
+    }
+
+    renderUI() {
+        this.display.drawText(2, 41, `HP: ${this.player.components.fighter.hp}/${this.player.components.fighter.maxHp}`)
     }
 
     render() {
@@ -74,6 +89,7 @@ export class Engine {
             this.display.draw(x, y, this.map.entities[e].glyph, this.map.entities[e].color);
         }
         this.renderLog();
+        this.renderUI();
         this.display.draw(this.player.x, this.player.y, this.player.glyph, this.player.color);
     }
 }

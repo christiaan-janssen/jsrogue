@@ -2,7 +2,7 @@
 
 
 /**
- * The base class for all game entitys
+ * The base class for all game entities
  */
 export class Entity {
     /**
@@ -18,6 +18,7 @@ export class Entity {
         this.glyph = glyph;
         this.color = color;
         this.name = name;
+        this.components = new Object;
     }
 
     /**

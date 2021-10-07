@@ -1,4 +1,5 @@
 import { Map, FOV  } from "rot-js";
+import { Fighter } from "./components";
 import { Entity  } from './entity';
 
 class Tile {
@@ -68,7 +69,8 @@ export class GameMap {
   createMonsters(rooms) {
     let entities = [];
     for (let i = 1; i < rooms.length; i++) {
-      let enemy = new Entity(rooms[i]._x1+1, rooms[i]._y1+1, 'o', 'green', 'Orc')
+      let enemy = new Entity(rooms[i]._x1+1, rooms[i]._y1+1, 'o', 'green', 'Orc');
+      enemy.components.fighter = new Fighter(1, 1, 5);
       entities.push(enemy);
     }
     return entities;
