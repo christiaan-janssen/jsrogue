@@ -8,6 +8,7 @@ let engine = new Engine(GAME_WIDTH, GAME_HEIGHT);
 
 // Call render once to show something on the screen
 engine.render();
+engine.run();
 
 window.addEventListener("keyup", (e) => engine.handleEvents(e));
 document.body.appendChild(engine.display.getContainer());

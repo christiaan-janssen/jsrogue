@@ -18,6 +18,7 @@ export class Entity {
         this.glyph = glyph;
         this.color = color;
         this.name = name;
+        this.blocking = true;
         this.components = new Object;
     }
 
