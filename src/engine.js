@@ -8,6 +8,7 @@ import { Fighter } from './components';
  * Main game engine. Handles input / rendering / gameState
  * TODO: Fix low cohesion in this class
  * TODO: Look into scheduling: https://ondras.github.io/rot.js/manual/#timing
+ * TODO: Add colors to the log
  */
 
 export class Engine {
@@ -17,11 +18,20 @@ export class Engine {
         this.map = new GameMap(80, 40);
         this.gameLog = ["Welcome to jsRogue!"];
         this.scheduler = new Scheduler.Simple();
-
+        this.player = this.createPlayer();
         this.display = new Display({ width: this.width, height: this.height });
         this.eventHandler = new EventHandler();
         this.playerMoved = false;
     }
+  createPlayer() {
+    let player = new Entity(
+        this.map.rooms[0]._x1 + 1,
+        this.map.rooms[0]._y1 + 1,
+      "@", "white", "Player"
+    );
+    player.components.fighter = new Fighter(3, 2, 15);
+    return player;
+  }
 
     run() {
         for (let i = 0; i < this.map.entities.length; i++) {
@@ -34,31 +44,10 @@ export class Engine {
 
     handleEvents(e) {
         let action = this.eventHandler.handleKeys(e);
+        if(action !== undefined)
+            action.perform(this, this.player);
 
-        if (action.type === 'move') {
-            let dx = this.map.player.x + action.dx;
-            let dy = this.map.player.y + action.dy;
-            let maybeEntity = this.map.getBlockingEntityAt(dx, dy);
-            if (maybeEntity !== undefined && maybeEntity.blocking) {
-                let dmg = this.map.player.components.fighter.attack - maybeEntity.components.fighter.defence;
-                maybeEntity.components.fighter.takeDmg(dmg);
-                if (maybeEntity.components.fighter.hp <= 0) {
-                    this.gameLog.push(`You kill the ${maybeEntity.name}!`);
-                    maybeEntity.glyph = '%';
-                    maybeEntity.color = 'red';
-                    maybeEntity.blocking = false;
-                } else {
-                    this.gameLog.push(`You hit the ${maybeEntity.name} for ${dmg} damage`);
-                }
-            } else if (!this.map.map[dx][dy].isWall()) {
-                this.map.player.move(action.dx, action.dy);
-            }
-            this.playerMoved = true;
-        }
-
-        if(this.playerMoved) {
-            this.run();
-        }
+        this.run();
     }
 
     renderLog() {
@@ -71,15 +60,15 @@ export class Engine {
     }
 
     renderUI() {
-        this.display.drawText(2, 41, `HP: ${this.map.player.components.fighter.hp}/${this.map.player.components.fighter.maxHp}`)
+        this.display.drawText(2, 41, `HP: ${this.player.components.fighter.hp}/${this.player.components.fighter.maxHp}`)
     }
 
     render() {
         this.display.clear();
-        this.map.updateFov(this.map.player);
+        this.map.updateFov(this.player);
         this.map.render(this.display);
         this.renderLog();
         this.renderUI();
-        this.display.draw(this.map.player.x, this.map.player.y, this.map.player.glyph, this.map.player.color);
+        this.display.draw(this.player.x, this.player.y, this.player.glyph, this.player.color);
     }
 }

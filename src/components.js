@@ -52,8 +52,5 @@ export class AI {
     }
 
     run() {
-        // let dx = this.map.player.x;
-        // let dy = this.map.player.y;
-        this.astar.compute
     }
 }

@@ -30,16 +30,19 @@ export class GameMap {
     this.map = new Array(width);
     this.mapData = this.createMap(this.width, this.height);
     this.rooms = this.mapData.getRooms();
+    // this.player = this.createPlayer();
     this.entities = this.createMonsters(this.rooms);
-    this.player = new Entity(
-      this.rooms[0]._x1 + 1,
-      this.rooms[0]._y1 + 1,
-      "@", "white", "Player"
-    );
-    this.player.components.fighter = new Fighter(3, 2, 15);
     this.fov;
     this.viewshed = [];
   }
+
+  inBounds(dx, dy) {
+    if (dx > 0 && dx < this.width && dy > 0 && dy < this.height) {
+      return true
+    }
+    return false;
+  }
+
 
   createMap(w, h) {
     let mapData = new Map.Digger(w, h);
@@ -77,7 +80,7 @@ export class GameMap {
     for (let i = 1; i < rooms.length; i++) {
       let enemy = new Entity(rooms[i]._x1 + 1, rooms[i]._y1 + 1, 'o', 'green', 'Orc');
       enemy.components.fighter = new Fighter(1, 1, 5);
-      enemy.components.AI = new AI();
+      enemy.components.AI = new AI(enemy.x, enemy.y, this.map);
       entities.push(enemy);
     }
     return entities;
@@ -98,9 +101,11 @@ export class GameMap {
     this.viewshed = [];
     this.fov.compute(
       player.x, player.y, 10, (x, y, r, v) => {
-        this.viewshed.push(x + ',' + y);
+        if (this.inBounds(x, y)) {
+          this.viewshed.push(x + ',' + y);
 
-        this.map[x][y].explored = true;
+          this.map[x][y].explored = true;
+        }
       });
   }
   render(display) {
@@ -129,6 +134,5 @@ export class GameMap {
       if (this.viewshed.includes(x + ',' + y))
         display.draw(x, y, this.entities[e].glyph, this.entities[e].color);
     }
-    display.draw(this.player.x, this.player.y, this.player.glyph, this.player.color);
   }
 }
