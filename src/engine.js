@@ -3,6 +3,7 @@ import { EventHandler } from './input_handlers';
 import { Entity } from './entity';
 import { GameMap } from './game_map';
 import { Fighter } from './components';
+import { GameLog } from './gamelog';
 
 /**
  * Main game engine. Handles input / rendering / gameState
@@ -16,22 +17,24 @@ export class Engine {
         this.width = width;
         this.height = height
         this.map = new GameMap(80, 40);
-        this.gameLog = ["Welcome to jsRogue!"];
+        this.gameLog = new GameLog();
         this.scheduler = new Scheduler.Simple();
         this.player = this.createPlayer();
         this.display = new Display({ width: this.width, height: this.height });
         this.eventHandler = new EventHandler();
         this.playerMoved = false;
+
+        this.gameLog.add("Welcome to jsRogue!");
     }
-  createPlayer() {
-    let player = new Entity(
-        this.map.rooms[0]._x1 + 1,
-        this.map.rooms[0]._y1 + 1,
-      "@", "white", "Player"
-    );
-    player.components.fighter = new Fighter(3, 2, 15);
-    return player;
-  }
+    createPlayer() {
+        let player = new Entity(
+            this.map.rooms[0]._x1 + 1,
+            this.map.rooms[0]._y1 + 1,
+            "@", "white", "Player"
+        );
+        player.components.fighter = new Fighter(3, 2, 15);
+        return player;
+    }
 
     run() {
         for (let i = 0; i < this.map.entities.length; i++) {
@@ -44,7 +47,7 @@ export class Engine {
 
     handleEvents(e) {
         let action = this.eventHandler.handleKeys(e);
-        if(action !== undefined)
+        if (action !== undefined)
             action.perform(this, this.player);
 
         this.run();
@@ -53,9 +56,6 @@ export class Engine {
     renderLog() {
         for (let i = 0; i < this.gameLog.length; i++) {
             this.display.drawText(20, 41 + i, this.gameLog[i]);
-        }
-        if (this.gameLog.length > 7) {
-            this.gameLog.shift();
         }
     }
 
@@ -67,7 +67,7 @@ export class Engine {
         this.display.clear();
         this.map.updateFov(this.player);
         this.map.render(this.display);
-        this.renderLog();
+        this.gameLog.render(20, 41, this.display);
         this.renderUI();
         this.display.draw(this.player.x, this.player.y, this.player.glyph, this.player.color);
     }
