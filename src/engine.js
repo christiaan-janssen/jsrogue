@@ -1,4 +1,4 @@
-import { Display, Scheduler } from "rot-js";
+import { Display, Scheduler, Path } from "rot-js";
 import { EventHandler } from './input_handlers';
 import { Entity } from './entity';
 import { GameMap } from './game_map';
@@ -36,11 +36,12 @@ export class Engine {
         return player;
     }
 
-    run() {
-        for (let i = 0; i < this.map.entities.length; i++) {
-            this.map.entities[0].components.AI.run();
-        }
+    init() {
+        this.render();
+    }
 
+    run() {
+        this.handleEnemyTurns();
         this.render();
         this.playerMoved = false;
     }
@@ -53,14 +54,36 @@ export class Engine {
         this.run();
     }
 
-    renderLog() {
-        for (let i = 0; i < this.gameLog.length; i++) {
-            this.display.drawText(20, 41 + i, this.gameLog[i]);
+    handleEnemyTurns() {
+        for (let e = 0; e < this.map.entities.length; e++) {
+            this.map.entities[e].components.AI.run(this);
         }
     }
 
     renderUI() {
         this.display.drawText(2, 41, `HP: ${this.player.components.fighter.hp}/${this.player.components.fighter.maxHp}`)
+    }
+
+    /**
+     * @param {number} x1
+     * @param {number} y1
+     * @returns {number[]}
+     * */
+    calculatePath(x1,y1) {
+        let path = [];
+        let astar = new Path.AStar(this.player.x, this.player.y, (x, y) => {
+            if (this.map.inBounds(x,y)) {
+                if (this.map.tiles[x][y].type === 'floor') {
+                    return true;
+                }
+            }
+        });
+        let pathCallBack = function(x,y) {
+            path.push([x,y]);
+        }
+        astar.compute(x1, y1, pathCallBack);
+
+        return path;
     }
 
     render() {

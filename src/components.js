@@ -1,7 +1,8 @@
 // @ts-check
 
-import { Path } from "rot-js"
-import { GameMap } from './game_map'
+import { Entity } from './entity';
+import { Engine } from './engine';
+import { BumpAction } from './actions';
 
 
 export class Fighter {
@@ -40,17 +41,27 @@ export class Fighter {
 export class AI {
     /**
      * The basic ai class
-     * @param {number} x
-     * @param {number} y
-     * @param {GameMap} map
+     * @param {Entity} entity
      */
-    constructor(x, y, map) {
-        this.x = x;
-        this.y = y
-        this.map = map
-        this.astar = new Path.AStar(this.x, this.y, (x, y) => { return !this.map[x][y].isWall ? true : false })
+    constructor(entity) {
+        this.entity = entity;
+        this.path = [];
     }
 
-    run() {
+    /**
+     * @param {Engine} engine
+     * */
+    run(engine) {
+        this.path = engine.calculatePath(this.entity.x, this.entity.y);
+
+        for (let i=0; i < this.path.length; i++) {
+            console.log (`x: ${this.path[i][0]} - y: ${this.path[i][0]}`)
+        }
+        let x = this.path[0][0] - this.entity.x;
+        let y = this.path[0][1] - this.entity.y;
+        let action = new BumpAction(x ,y);
+        if (action !== undefined)
+            action.perform(engine, this.entity);
+
     }
 }

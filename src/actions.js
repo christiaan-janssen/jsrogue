@@ -53,7 +53,7 @@ class MeleeAction extends ActionWithDirection {
 
     let target = engine.map.getBlockingEntityAt(destX, destY);
     if (target !== undefined) {
-      console.log(`You hit the ${target.name}`);
+      engine.gameLog.add(`You hit the ${target.name}`)
     }
   }
 }
@@ -79,7 +79,7 @@ class MovementAction extends ActionWithDirection {
       return;
     }
 
-    if (engine.map.map[destX][destY].isWall()) {
+    if (engine.map.tiles[destX][destY].isWall()) {
       return;
     }
 
