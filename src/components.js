@@ -54,12 +54,15 @@ export class AI {
     run(engine) {
         this.path = engine.calculatePath(this.entity.x, this.entity.y);
 
-        for (let i=0; i < this.path.length; i++) {
-            console.log (`x: ${this.path[i][0]} - y: ${this.path[i][0]}`)
-        }
-        let x = this.path[0][0] - this.entity.x;
-        let y = this.path[0][1] - this.entity.y;
-        let action = new BumpAction(x ,y);
+        //for (let i = 0; i < this.path.length; i++) {
+        //    console.log(`x: ${this.path[i][0]} - y: ${this.path[i][0]}`)
+        //}
+
+        let x = this.path[1][0] - this.entity.x;
+        let y = this.path[1][1] - this.entity.y;
+
+        //this.entity.move(x, y);
+        let action = new BumpAction(x, y);
         if (action !== undefined)
             action.perform(engine, this.entity);
 

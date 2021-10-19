@@ -33,6 +33,7 @@ export class Engine {
             "@", "white", "Player"
         );
         player.components.fighter = new Fighter(3, 2, 15);
+        this.map.entities.push(player)
         return player;
     }
 
@@ -41,27 +42,38 @@ export class Engine {
     }
 
     run() {
-        this.handleEnemyTurns();
-        this.render();
-        this.playerMoved = false;
+        if (this.playerMoved) {
+            this.handleEnemyTurns();
+            this.render();
+            this.playerMoved = false;
+        }
     }
 
     handleEvents(e) {
         let action = this.eventHandler.handleKeys(e);
-        if (action !== undefined)
+        if (action !== undefined) {
             action.perform(this, this.player);
+            this.playerMoved = true;
+        }
 
         this.run();
     }
 
     handleEnemyTurns() {
         for (let e = 0; e < this.map.entities.length; e++) {
-            this.map.entities[e].components.AI.run(this);
+            let entity = this.map.entities[e];
+            if (entity.components.AI !== undefined &&
+                this.map.viewshed.includes(entity.x + ',' + entity.y)) {
+                this.map.entities[e].components.AI.run(this);
+            }
         }
     }
 
     renderUI() {
-        this.display.drawText(2, 41, `HP: ${this.player.components.fighter.hp}/${this.player.components.fighter.maxHp}`)
+        this.display.drawText(
+            2, 41,
+            `HP: ${this.player.components.fighter.hp}/${this.player.components.fighter.maxHp}`
+        )
     }
 
     /**
@@ -69,17 +81,17 @@ export class Engine {
      * @param {number} y1
      * @returns {number[]}
      * */
-    calculatePath(x1,y1) {
+    calculatePath(x1, y1) {
         let path = [];
         let astar = new Path.AStar(this.player.x, this.player.y, (x, y) => {
-            if (this.map.inBounds(x,y)) {
+            if (this.map.inBounds(x, y)) {
                 if (this.map.tiles[x][y].type === 'floor') {
                     return true;
                 }
             }
         });
-        let pathCallBack = function(x,y) {
-            path.push([x,y]);
+        let pathCallBack = function(x, y) {
+            path.push([x, y]);
         }
         astar.compute(x1, y1, pathCallBack);
 
