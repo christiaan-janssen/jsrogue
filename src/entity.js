@@ -20,6 +20,7 @@ export class Entity {
         this.name = name;
         this.blocking = true;
         this.components = new Object;
+        this.effects = new Object;
     }
 
     /**
@@ -30,5 +31,17 @@ export class Entity {
     move(dx, dy) {
         this.x += dx;
         this.y += dy;
+    }
+
+    /**
+     * @param {import("./gamelog").GameLog} gamelog
+     */
+    die(gamelog) {
+        gamelog.add(`%c{red}The ${this.name} dies!`);
+        this.components.AI = undefined;
+        this.glyph = '%';
+        this.color = 'red';
+        this.blocking = false;
+        this.name = `the corps of a ${this.name}`;
     }
 }

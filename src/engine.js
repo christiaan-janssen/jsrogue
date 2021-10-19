@@ -54,6 +54,10 @@ export class Engine {
         if (action !== undefined) {
             action.perform(this, this.player);
             this.playerMoved = true;
+            let item = this.map.getNonBlockingItem(this.player.x, this.player.y);
+            if (item !== undefined) {
+                this.gameLog.add(`You see ${item.name} here`)
+            }
         }
 
         this.run();

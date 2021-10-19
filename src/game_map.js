@@ -1,5 +1,6 @@
 import { Map, FOV } from "rot-js";
 import { Fighter, AI } from "./components";
+import { Heal }  from './effects';
 import { Entity } from './entity';
 
 class Tile {
@@ -35,6 +36,7 @@ export class GameMap {
     this.entities = this.createMonsters(this.rooms);
     this.fov;
     this.viewshed = [];
+    this.createItems(this.rooms);
   }
 
   inBounds(x, y) {
@@ -81,7 +83,7 @@ export class GameMap {
   createMonsters(rooms) {
     let entities = [];
     for (let i = 1; i < rooms.length; i++) {
-      let enemy = new Entity(rooms[i]._x1 + 1, rooms[i]._y1 + 1, 'o', 'green', 'Orc');
+      let enemy = new Entity(rooms[i]._x1 + 1, rooms[i]._y1 + 1, 'k', 'lightgreen', 'Kobold');
       enemy.components.fighter = new Fighter(1, 1, 5);
       enemy.components.AI = new AI(enemy, this);
       entities.push(enemy);
@@ -89,10 +91,25 @@ export class GameMap {
     return entities;
   }
 
+  createItems(rooms) {
+    let healthPotion = new Entity(rooms[0]._x1 + 2, rooms[0]._y1 + 2, 'p', 'pink', 'Health Potion');
+    healthPotion.blocking = false;
+    this.entities.push(healthPotion)
+  }
+
   getBlockingEntityAt(x, y) {
     for (let i = 0; i < this.entities.length; i++) {
       if (this.entities[i].x === x && this.entities[i].y === y
           && this.entities[i].blocking) {
+        return this.entities[i];
+      }
+    }
+  }
+
+  getNonBlockingItem(x,y) {
+    for (let i = 0; i < this.entities.length; i++) {
+      if (this.entities[i].x === x && this.entities[i].y === y
+          && !this.entities[i].blocking) {
         return this.entities[i];
       }
     }
@@ -117,7 +134,7 @@ export class GameMap {
   render(display) {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        // if (this.tiles[x][y].explored) {
+        if (this.tiles[x][y].explored) {
           if (this.viewshed.includes(x + ',' + y)) {
             if (this.tiles[x][y].blocked === false) {
               display.draw(x, y, '.', 'white');
@@ -131,14 +148,14 @@ export class GameMap {
               display.draw(x, y, '#', 'gray');
             }
           }
-        // }
+        }
       }
     }
     for (let e = 0; e < this.entities.length; e++) {
       let x = this.entities[e].x;
       let y = this.entities[e].y;
-      // if (this.viewshed.includes(x + ',' + y))
-      display.draw(x, y, this.entities[e].glyph, this.entities[e].color);
+      if (this.viewshed.includes(x + ',' + y))
+        display.draw(x, y, this.entities[e].glyph, this.entities[e].color);
     }
   }
 }

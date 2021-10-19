@@ -53,22 +53,16 @@ class MeleeAction extends ActionWithDirection {
         if (target !== undefined) {
             let dmg = entity.components.fighter.attack - target.components.fighter.defence
             if (dmg > 0) {
+                let who = target.name === 'Player'? "You" : entity.name;
                 target.components.fighter.takeDmg(dmg);
-                engine.gameLog.add(`You hit the ${target.name} for ${dmg} dmg`);
+                engine.gameLog.add(`${entity.name} hit the ${target.name} for %c{red}${dmg} dmg`);
             } else {
-                engine.gameLog.add(`You try hit the ${target.name} but you miss`);
+                engine.gameLog.add(`%c{yellow}${entity.name} try hit the ${target.name} but you miss`);
             }
 
             if (target.components.fighter.hp <= 0) {
-                engine.gameLog.add(`The ${target.name} dies!`);
-                target.components.AI = undefined;
-                target.glyph = '%';
-                target.color = 'red';
-                target.blocking = false;
+                target.die(engine.gameLog);
             }
-
-        } else {
-            engine.gameLog.add(`Something went wrong!`)
         }
     }
 }

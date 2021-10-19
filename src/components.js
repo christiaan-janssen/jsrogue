@@ -65,6 +65,5 @@ export class AI {
         let action = new BumpAction(x, y);
         if (action !== undefined)
             action.perform(engine, this.entity);
-
     }
 }
