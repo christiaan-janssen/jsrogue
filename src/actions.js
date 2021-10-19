@@ -1,5 +1,3 @@
-// @ts-check
-
 import { Engine } from './engine';
 import { Entity } from './entity';
 
@@ -53,7 +51,22 @@ class MeleeAction extends ActionWithDirection {
 
         let target = engine.map.getBlockingEntityAt(destX, destY);
         if (target !== undefined) {
-            engine.gameLog.add(`You hit the ${target.name}`)
+            let dmg = entity.components.fighter.attack - target.components.fighter.defence
+            if (dmg > 0) {
+                target.components.fighter.takeDmg(dmg);
+                engine.gameLog.add(`You hit the ${target.name} for ${dmg} dmg`);
+            } else {
+                engine.gameLog.add(`You try hit the ${target.name} but you miss`);
+            }
+
+            if (target.components.fighter.hp <= 0) {
+                engine.gameLog.add(`The ${target.name} dies!`);
+                target.components.AI = undefined;
+                target.glyph = '%';
+                target.color = 'red';
+                target.blocking = false;
+            }
+
         } else {
             engine.gameLog.add(`Something went wrong!`)
         }

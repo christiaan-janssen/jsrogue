@@ -91,7 +91,8 @@ export class GameMap {
 
   getBlockingEntityAt(x, y) {
     for (let i = 0; i < this.entities.length; i++) {
-      if (this.entities[i].x === x && this.entities[i].y === y) {
+      if (this.entities[i].x === x && this.entities[i].y === y
+          && this.entities[i].blocking) {
         return this.entities[i];
       }
     }
