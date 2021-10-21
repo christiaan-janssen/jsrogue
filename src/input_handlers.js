@@ -72,6 +72,24 @@ export class EventHandler {
             }
         }
 
+        // Inventory managment keys
+        if (this.inventoryVisible) {
+            let letter = key.slice(-1).toLowerCase();
+
+            for (let i = 0; i < engine.inventory.items.length; i++) {
+                let item = engine.inventory.items[i]
+                if (item.letter === letter) {
+                    let index = engine.inventory.items.indexOf(item);
+                    let effect = item.effects;
+                    if (effect != undefined) {
+                        effect.apply(engine, engine.player);
+                        engine.inventory.items.splice(index, 1);
+                        engine.inventory.render();
+                    }
+                }
+            }
+        }
+
         return action;
     }
 }

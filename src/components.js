@@ -35,6 +35,7 @@ export class Fighter {
         if (this.hp > this.maxHp) {
             this.hp = this.maxHp;
         }
+
     }
 }
 
@@ -53,10 +54,6 @@ export class AI {
      * */
     run(engine) {
         this.path = engine.calculatePath(this.entity.x, this.entity.y);
-
-        //for (let i = 0; i < this.path.length; i++) {
-        //    console.log(`x: ${this.path[i][0]} - y: ${this.path[i][0]}`)
-        //}
 
         let x = this.path[1][0] - this.entity.x;
         let y = this.path[1][1] - this.entity.y;

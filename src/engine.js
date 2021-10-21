@@ -5,6 +5,7 @@ import { GameMap } from './game_map';
 import { Fighter } from './components';
 import { GameLog } from './gamelog';
 import { Inventory } from './inventory';
+import { Heal } from './effects';
 
 /**
  * Main game engine. Handles input / rendering / gameState
@@ -24,7 +25,6 @@ export class Engine {
         this.eventHandler = new EventHandler();
         this.playerMoved = false;
         this.inventory = new Inventory();
-
         this.gameLog.add("Welcome to jsRogue!");
     }
 
