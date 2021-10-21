@@ -4,12 +4,12 @@ import { Entity } from './entity';
 import { GameMap } from './game_map';
 import { Fighter } from './components';
 import { GameLog } from './gamelog';
+import { Inventory } from './inventory';
 
 /**
  * Main game engine. Handles input / rendering / gameState
  * TODO: Fix low cohesion in this class
  * TODO: Look into scheduling: https://ondras.github.io/rot.js/manual/#timing
- * TODO: Add colors to the log
  */
 
 export class Engine {
@@ -23,9 +23,11 @@ export class Engine {
         this.display = new Display({ width: this.width, height: this.height });
         this.eventHandler = new EventHandler();
         this.playerMoved = false;
+        this.inventory = new Inventory();
 
         this.gameLog.add("Welcome to jsRogue!");
     }
+
     createPlayer() {
         let player = new Entity(
             this.map.rooms[0]._x1 + 1,
@@ -50,7 +52,7 @@ export class Engine {
     }
 
     handleEvents(e) {
-        let action = this.eventHandler.handleKeys(e);
+        let action = this.eventHandler.handleKeys(e, this);
         if (action !== undefined) {
             action.perform(this, this.player);
             this.playerMoved = true;
@@ -73,11 +75,15 @@ export class Engine {
         }
     }
 
+    renderInventory() {
+    }
+
     renderUI() {
         this.display.drawText(
             2, 41,
             `HP: ${this.player.components.fighter.hp}/${this.player.components.fighter.maxHp}`
         )
+        this.inventory.render();
     }
 
     /**
@@ -109,5 +115,6 @@ export class Engine {
         this.gameLog.render(20, 41, this.display);
         this.renderUI();
         this.display.draw(this.player.x, this.player.y, this.player.glyph, this.player.color);
+        this.renderInventory();
     }
 }
